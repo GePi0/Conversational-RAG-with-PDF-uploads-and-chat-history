@@ -5,6 +5,5 @@ pypdf
 pymupdf
 langchain-text-splitters
 langchain_ollama
-chromadb
 langchain_chroma
 streamlit
