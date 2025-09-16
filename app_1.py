@@ -16,14 +16,14 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-embeddings = OllamaEmbeddings(model="embeddinggemma:300m")
+embeddings = OllamaEmbeddings(model="")
 
 ## ste up Streamlit app
 st.title("Conversational RAG with PDF uploads and chat history")
 st.write("Upload PDF's and chat with their content")
 
 ## Model in local
-llm = Ollama(model="gemma3:4b")
+llm = Ollama(model="")
 
 ## Input Groq API Key (if needed, now i run in local)
 #api_key=st.text_input("Enter your Groq API Key:", type="password")
