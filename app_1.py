@@ -21,22 +21,27 @@ st.title("Conversational RAG With PDF uploads and chat history")
 st.write("Upload PDFs and chat with their content")
 
 ## Input the Hugging Face API Key
+if "hf_token" not in st.session_state:
+    st.session_state.hf_token = None
+
 api_key = st.text_input("Enter your Hugging Face API key:", type="password")
 submit_token = st.button("Set Token & Load Model")
 
 
 ## Check if Hugging Face API Key is provided
 if submit_token and api_key:
-    os.environ["HF_TOKEN"] = api_key
+    st.session_state.hf_token = api_key
+    st.success("Token saved! Now load the model.")
 
-    # LLM y embeddings desde HuggingFace
-    llm_pipeline = HuggingFacePipeline.from_model_id(
-        model_id="Qwen/Qwen3-4B-Instruct-2507",      # repo del modelo
-        task="text-generation"                       # la tarea        
+# LLM y embeddings desde HuggingFace
+if st.session_state.hf_token and "llm_pipeline" not in st.session_state:
+    os.environ["HF_TOKEN"] = st.session_state.hf_token
+    st.session_state.llm_pipeline = HuggingFacePipeline.from_model_id(
+        model_id="Qwen/Qwen3-4B-Instruct-2507",
+        task="text-generation"
     )
-    llm = ChatHuggingFace(llm=llm_pipeline)
-    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-
+    st.session_state.llm = ChatHuggingFace(llm=st.session_state.llm_pipeline)
+    st.session_state.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     st.success("Model loaded successfully!")
 
     ## chat interface
@@ -69,7 +74,7 @@ if submit_token and api_key:
         # Split and create embeddings for the documents
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=5000, chunk_overlap=500)
         splits = text_splitter.split_documents(documents)
-        vectorstore = FAISS.from_documents(documents=splits, embedding=embeddings)
+        vectorstore = FAISS.from_documents(documents=splits, embedding=st.session_state.embeddings)
         retriever = vectorstore.as_retriever()
 
         contextualize_q_system_prompt = (
@@ -88,7 +93,7 @@ if submit_token and api_key:
         )
 
         history_aware_retriever = create_history_aware_retriever(
-            llm, retriever, contextualize_q_prompt
+            st.session_state.llm, retriever, contextualize_q_prompt
         )
 
         ## Answer question
@@ -109,7 +114,7 @@ if submit_token and api_key:
             ]
         )
 
-        question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
+        question_answer_chain = create_stuff_documents_chain(st.session_state.llm, qa_prompt)
         rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
 
         def get_session_history(session: str) -> BaseChatMessageHistory:
