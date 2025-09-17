@@ -1,9 +1,6 @@
 langchain
-python-dotenv
 langchain_community
-pypdf
-pymupdf
 langchain-text-splitters
-langchain_ollama
+langchain_huggingface
 faiss-cpu
 streamlit
