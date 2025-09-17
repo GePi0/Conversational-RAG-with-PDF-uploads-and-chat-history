@@ -22,9 +22,11 @@ st.write("Upload PDFs and chat with their content")
 
 ## Input the Hugging Face API Key
 api_key = st.text_input("Enter your Hugging Face API key:", type="password")
+submit_token = st.button("Set Token & Load Model")
+
 
 ## Check if Hugging Face API Key is provided
-if api_key:
+if submit_token and api_key:
     os.environ["HF_TOKEN"] = api_key
 
     # LLM y embeddings desde HuggingFace
@@ -34,6 +36,8 @@ if api_key:
     )
     llm = ChatHuggingFace(llm=llm_pipeline)
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+
+    st.success("Model loaded successfully!")
 
     ## chat interface
     session_id = st.text_input("Session ID", value="default_session")
