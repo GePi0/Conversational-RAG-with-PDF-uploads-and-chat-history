@@ -5,3 +5,5 @@ langchain_huggingface
 faiss-cpu
 streamlit
 transformers
+sentence_transformers
+torch
