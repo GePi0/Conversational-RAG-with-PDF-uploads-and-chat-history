@@ -4,3 +4,4 @@ langchain-text-splitters
 langchain_huggingface
 faiss-cpu
 streamlit
+transformers
